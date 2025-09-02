@@ -1,20 +1,33 @@
 {
-  "name": "hello-cafeine-v5",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start",
-    "lint": "biome check",
-    "format": "biome format --write"
-  },
-  "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.5.2"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.2.0"
-  }
+	"name": "hello-cafeine-v5",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev --turbopack",
+		"build": "next build --turbopack",
+		"start": "next start",
+		"lint": "biome check",
+		"format": "biome format --write",
+		"reinstall": "rm -f package-lock.json yarn.lock pnpm-lock.yaml && rm -rf node_modules && pnpm i"
+	},
+	"dependencies": {
+		"@gsap/react": "^2.1.2",
+		"@react-three/drei": "^10.7.4",
+		"@react-three/fiber": "^9.3.0",
+		"@react-three/postprocessing": "^3.0.4",
+		"@types/three": "^0.179.0",
+		"gsap": "^3.13.0",
+		"lenis": "^1.3.11",
+		"leva": "^0.10.0",
+		"mouse-follower": "^1.1.2",
+		"next": "15.5.2",
+		"postprocessing": "^6.37.7",
+		"react": "19.1.0",
+		"react-dom": "19.1.0",
+		"sass": "^1.91.0",
+		"three": "^0.179.1"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.0"
+	}
 }

@@ -1,0 +1,17 @@
+@use '@mixins' as *;
+
+.hero {
+	height: 300vh;
+
+	.background {
+		position: sticky;
+		top: 0;
+		left: 0;
+		height: 100vh;
+		width: 100vw;
+
+		video {
+			@include img;
+		}
+	}
+}
