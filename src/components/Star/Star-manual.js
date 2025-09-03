@@ -20,17 +20,53 @@ import {
 	SSAO,
 } from '@react-three/postprocessing'
 import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
+import { useFrame } from '@react-three/fiber'
+import gsap from 'gsap'
 import * as THREE from 'three'
 
 import styles from './Star.module.scss'
 
-function GoboSpotlight({ settings, decayAnimation, ref }) {
+function GoboSpotlight({ ref }) {
 	const spotlightRef = useRef()
+	const decayValue = useRef(0.59)
 	const goboTexture = useTexture('/gobo-pattern.webp')
 
 	goboTexture.wrapS = goboTexture.wrapT = THREE.RepeatWrapping
 	goboTexture.magFilter = THREE.LinearFilter
 	goboTexture.minFilter = THREE.LinearMipmapLinearFilter
+
+	// Setup decay animation on mount
+	useEffect(() => {
+		const timeline = gsap.timeline({
+			repeat: -1,
+			yoyo: true,
+			ease: 'sine.inOut',
+		})
+
+		// Animate between 0.3 and 0.8 with 0.59 as the base
+		timeline
+			.to(decayValue, {
+				current: 0.72,
+				duration: 5,
+				ease: 'sine.inOut',
+			})
+			.to(decayValue, {
+				current: 0.4,
+				duration: 5,
+				ease: 'sine.inOut',
+			})
+
+		return () => {
+			timeline.kill()
+		}
+	}, [])
+
+	// Apply the animated decay value to the spotlight
+	useFrame(() => {
+		if (spotlightRef.current) {
+			spotlightRef.current.decay = decayValue.current
+		}
+	})
 
 	return (
 		<SpotLight

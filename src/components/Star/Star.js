@@ -20,46 +20,64 @@ import {
 	SSAO,
 } from '@react-three/postprocessing'
 import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
+import { useFrame } from '@react-three/fiber'
+import gsap from 'gsap'
 import * as THREE from 'three'
-import { useControls, folder } from 'leva'
 
 import styles from './Star.module.scss'
 
-function GoboSpotlight() {
+function GoboSpotlight({ ref }) {
 	const spotlightRef = useRef()
+	const decayValue = useRef(0.59)
 	const goboTexture = useTexture('/gobo-pattern.webp')
 
 	goboTexture.wrapS = goboTexture.wrapT = THREE.RepeatWrapping
 	goboTexture.magFilter = THREE.LinearFilter
 	goboTexture.minFilter = THREE.LinearMipmapLinearFilter
 
-	// Spotlight controls
-	const spotlightControls = useControls('Spotlight', {
-		intensity: { value: 400, min: 0, max: 1000, step: 10 },
-		angle: { value: 0.28, min: 0, max: Math.PI / 2, step: 0.01 },
-		penumbra: { value: 0.5, min: 0, max: 1, step: 0.01 },
-		distance: { value: 100, min: 0, max: 200, step: 1 },
-		decay: { value: 0.59, min: 0, max: 2, step: 0.01 },
-		positionX: { value: 10, min: -20, max: 20, step: 0.1 },
-		positionY: { value: 8, min: -20, max: 20, step: 0.1 },
-		positionZ: { value: 6, min: -20, max: 20, step: 0.1 },
-		color: '#b0af9e',
+	// Setup decay animation on mount
+	useEffect(() => {
+		const timeline = gsap.timeline({
+			repeat: -1,
+			yoyo: true,
+			ease: 'sine.inOut',
+		})
+
+		// Animate between 0.3 and 0.8 with 0.59 as the base
+		timeline
+			.to(decayValue, {
+				current: 0.72,
+				duration: 5,
+				ease: 'sine.inOut',
+			})
+			.to(decayValue, {
+				current: 0.4,
+				duration: 5,
+				ease: 'sine.inOut',
+			})
+
+		return () => {
+			timeline.kill()
+		}
+	}, [])
+
+	// Apply the animated decay value to the spotlight
+	useFrame(() => {
+		if (spotlightRef.current) {
+			spotlightRef.current.decay = decayValue.current
+		}
 	})
 
 	return (
 		<SpotLight
 			ref={spotlightRef}
-			intensity={spotlightControls.intensity}
-			angle={spotlightControls.angle}
-			penumbra={spotlightControls.penumbra}
-			distance={spotlightControls.distance}
-			decay={spotlightControls.decay}
-			position={[
-				spotlightControls.positionX,
-				spotlightControls.positionY,
-				spotlightControls.positionZ,
-			]}
-			color={spotlightControls.color}
+			intensity={400}
+			angle={0.28}
+			penumbra={0.5}
+			distance={100}
+			decay={0.59}
+			position={[10, 8, 6]}
+			color={'#b0af9e'}
 			map={goboTexture}
 			castShadow
 		/>
@@ -71,204 +89,67 @@ const StarModel = ({ onReady }) => {
 	const { scene, animations } = useGLTF('/glb/star.glb')
 	const { actions } = useAnimations(animations, scene)
 
-	// Model and animation controls
-	const modelControls = useControls('Model', {
-		scale: { value: 0.72, min: 0.1, max: 2, step: 0.01 },
-		positionX: { value: 0, min: -10, max: 10, step: 0.1 },
-		positionY: { value: -4, min: -10, max: 10, step: 0.1 },
-		positionZ: { value: 0, min: -10, max: 10, step: 0.1 },
-		rotationX: { value: 0, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
-		rotationY: { value: Math.PI * 2, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
-		rotationZ: { value: 0, min: -Math.PI * 2, max: Math.PI * 2, step: 0.01 },
-	})
-
-	// Float controls
-	const floatControls = useControls('Float Animation', {
-		enabled: { value: true, label: 'Enable Float' },
-		speed: { value: 2.4, min: 0, max: 10, step: 0.1 },
-		floatIntensity: { value: 0.8, min: 0, max: 5, step: 0.1 },
-		rotationIntensity: { value: 0.6, min: 0, max: 2, step: 0.1 },
-	})
-
-	// Environment controls
-	const envControls = useControls('Environment', {
-		environmentIntensity: { value: 0.1, min: 0, max: 1, step: 0.01 },
-		preset: {
-			value: 'park',
-			options: [
-				'park',
-				'sunset',
-				'dawn',
-				'night',
-				'warehouse',
-				'forest',
-				'apartment',
-				'studio',
-				'city',
-				'lobby',
-			],
-		},
-	})
-
-	// Camera controls
-	const cameraControls = useControls('Camera', {
-		fov: { value: 40, min: 10, max: 120, step: 1 },
-		positionX: { value: 0, min: -20, max: 20, step: 0.1 },
-		positionY: { value: 0, min: -20, max: 20, step: 0.1 },
-		positionZ: { value: 6, min: -20, max: 20, step: 0.1 },
-	})
-
-	// Post-processing controls
-	const postProcessing = useControls('Post Processing', {
-		'Tone Mapping': folder({
-			toneMapping: { value: true, label: 'Enabled' },
-			tmAdaptive: { value: true, label: 'Adaptive' },
-			tmResolution: { value: 352, min: 64, max: 1024, step: 16 },
-			tmMiddleGrey: { value: 0.1, min: 0, max: 1, step: 0.01 },
-			tmMaxLuminance: { value: 20.0, min: 1, max: 100, step: 0.5 },
-			tmAverageLuminance: { value: 0.3, min: 0, max: 1, step: 0.01 },
-			tmAdaptationRate: { value: 0.6, min: 0, max: 2, step: 0.01 },
-		}),
-		'Hue Saturation': folder({
-			hueSaturation: { value: true, label: 'Enabled' },
-			hue: { value: -0.2, min: -Math.PI, max: Math.PI, step: 0.01 },
-			saturation: { value: 0.22, min: -1, max: 1, step: 0.01 },
-		}),
-		Bloom: folder({
-			bloom: { value: true, label: 'Enabled' },
-			bloomIntensity: { value: 0.2, min: 0, max: 5, step: 0.01 },
-			bloomKernelSize: {
-				value: KernelSize.LARGE,
-				options: {
-					'Very Small': KernelSize.VERY_SMALL,
-					Small: KernelSize.SMALL,
-					Medium: KernelSize.MEDIUM,
-					Large: KernelSize.LARGE,
-					'Very Large': KernelSize.VERY_LARGE,
-					Huge: KernelSize.HUGE,
-				},
-			},
-			bloomLuminanceThreshold: { value: 0.9, min: 0, max: 1, step: 0.01 },
-			bloomLuminanceSmoothing: { value: 0.025, min: 0, max: 1, step: 0.001 },
-			bloomMipmapBlur: { value: false, label: 'Mipmap Blur' },
-		}),
-		'Brightness Contrast': folder({
-			brightnessContrast: { value: true, label: 'Enabled' },
-			brightness: { value: -1, min: -1, max: 1, step: 0.01 },
-			contrast: { value: 1, min: -1, max: 1, step: 0.01 },
-		}),
-		SSAO: folder({
-			ssao: { value: true, label: 'Enabled' },
-			ssaoSamples: { value: 30, min: 1, max: 64, step: 1 },
-			ssaoRings: { value: 4, min: 1, max: 16, step: 1 },
-			ssaoDistanceThreshold: { value: 1.0, min: 0, max: 1, step: 0.01 },
-			ssaoDistanceFalloff: { value: 0.0, min: 0, max: 1, step: 0.01 },
-			ssaoRangeThreshold: { value: 0.5, min: 0, max: 1, step: 0.01 },
-			ssaoRangeFalloff: { value: 0.1, min: 0, max: 1, step: 0.01 },
-			ssaoLuminanceInfluence: { value: 0.9, min: 0, max: 1, step: 0.01 },
-			ssaoRadius: { value: 20, min: 0.01, max: 100, step: 0.1 },
-			ssaoScale: { value: 0.5, min: 0, max: 2, step: 0.01 },
-			ssaoBias: { value: 0.5, min: -1, max: 1, step: 0.01 },
-		}),
-	})
-
 	useEffect(() => {
 		if (modelRef.current && onReady) {
 			onReady(modelRef.current)
 		}
 	}, [onReady])
 
-	const modelElement = (
-		<group>
-			<primitive
-				ref={modelRef}
-				object={scene}
-				scale={modelControls.scale}
-				position={[modelControls.positionX, modelControls.positionY, modelControls.positionZ]}
-				rotation={[modelControls.rotationX, modelControls.rotationY, modelControls.rotationZ]}
-			/>
-		</group>
-	)
-
 	return (
 		<>
-			{floatControls.enabled ? (
-				<Float
-					speed={floatControls.speed}
-					floatIntensity={floatControls.floatIntensity}
-					rotationIntensity={floatControls.rotationIntensity}
-				>
-					{modelElement}
-				</Float>
-			) : (
-				modelElement
-			)}
-
-			<Environment
-				renderPriority={1}
-				background={false}
-				environmentIntensity={envControls.environmentIntensity}
-				preset={envControls.preset}
-			/>
+			<Float speed={2.4} floatIntensity={0.8} rotationIntensity={0.6}>
+				<group>
+					<primitive
+						ref={modelRef}
+						object={scene.clone()}
+						scale={0.72}
+						position={[0, -4, 0]}
+						rotation={[0, Math.PI * 2, 0]}
+					/>
+				</group>
+			</Float>
+			<Environment renderPriority={1} background={false} environmentIntensity={0.1} preset="park" />
 			<GoboSpotlight />
 			<EffectComposer renderPriority={1} enableNormalPass={true}>
-				{postProcessing.toneMapping && (
-					<ToneMapping
-						blendFunction={BlendFunction.NORMAL}
-						adaptive={postProcessing.tmAdaptive}
-						resolution={postProcessing.tmResolution}
-						middleGrey={postProcessing.tmMiddleGrey}
-						maxLuminance={postProcessing.tmMaxLuminance}
-						averageLuminance={postProcessing.tmAverageLuminance}
-						adaptationRate={postProcessing.tmAdaptationRate}
-					/>
-				)}
-				{postProcessing.hueSaturation && (
-					<HueSaturation
-						blendFunction={BlendFunction.NORMAL}
-						hue={postProcessing.hue}
-						saturation={postProcessing.saturation}
-					/>
-				)}
-				{postProcessing.bloom && (
-					<Bloom
-						intensity={postProcessing.bloomIntensity}
-						blurPass={undefined}
-						kernelSize={postProcessing.bloomKernelSize}
-						luminanceThreshold={postProcessing.bloomLuminanceThreshold}
-						luminanceSmoothing={postProcessing.bloomLuminanceSmoothing}
-						mipmapBlur={postProcessing.bloomMipmapBlur}
-						resolutionX={Resolution.AUTO_SIZE}
-						resolutionY={Resolution.AUTO_SIZE}
-					/>
-				)}
-				{postProcessing.brightnessContrast && (
-					<BrightnessContrast
-						brightness={postProcessing.brightness}
-						contrast={postProcessing.contrast}
-					/>
-				)}
-				{postProcessing.ssao && (
-					<SSAO
-						blendFunction={BlendFunction.MULTIPLY}
-						samples={postProcessing.ssaoSamples}
-						rings={postProcessing.ssaoRings}
-						distanceThreshold={postProcessing.ssaoDistanceThreshold}
-						distanceFalloff={postProcessing.ssaoDistanceFalloff}
-						rangeThreshold={postProcessing.ssaoRangeThreshold}
-						rangeFalloff={postProcessing.ssaoRangeFalloff}
-						luminanceInfluence={postProcessing.ssaoLuminanceInfluence}
-						radius={postProcessing.ssaoRadius}
-						scale={postProcessing.ssaoScale}
-						bias={postProcessing.ssaoBias}
-					/>
-				)}
+				<ToneMapping
+					blendFunction={BlendFunction.NORMAL}
+					adaptive={true}
+					resolution={352}
+					middleGrey={0.1}
+					maxLuminance={20.0}
+					averageLuminance={0.3}
+					adaptationRate={0.6}
+				/>
+				<HueSaturation blendFunction={BlendFunction.NORMAL} hue={-0.2} saturation={0.22} />
+				<Bloom
+					intensity={0.2} // The bloom intensity.
+					blurPass={undefined} // A blur pass.
+					kernelSize={KernelSize.LARGE} // blur kernel size
+					luminanceThreshold={0.9} // luminance threshold. Raise this value to mask out darker elements in the scene.
+					luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
+					mipmapBlur={false} // Enables or disables mipmap blur.
+					resolutionX={Resolution.AUTO_SIZE} // The horizontal resolution.
+					resolutionY={Resolution.AUTO_SIZE} // The vertical resolution.
+				/>
+				<BrightnessContrast
+					brightness={-1} // brightness. min: -1, max: 1
+					contrast={1} // contrast: min -1, max: 1
+				/>
+				<SSAO
+					blendFunction={BlendFunction.MULTIPLY} // blend mode
+					samples={30} // amount of samples per pixel (shouldn't be a multiple of the ring count)
+					rings={4} // amount of rings in the occlusion sampling pattern
+					distanceThreshold={1.0} // global distance threshold at which the occlusion effect starts to fade out. min: 0, max: 1
+					distanceFalloff={0.0} // distance falloff. min: 0, max: 1
+					rangeThreshold={0.5} // local occlusion range threshold at which the occlusion starts to fade out. min: 0, max: 1
+					rangeFalloff={0.1} // occlusion range falloff. min: 0, max: 1
+					luminanceInfluence={0.9} // how much the luminance of the scene influences the ambient occlusion
+					radius={20} // occlusion sampling radius
+					scale={0.5} // scale of the ambient occlusion
+					bias={0.5} // occlusion bias
+				/>
 			</EffectComposer>
-			<PerspectiveCamera
-				makeDefault
-				fov={cameraControls.fov}
-				position={[cameraControls.positionX, cameraControls.positionY, cameraControls.positionZ]}
-			/>
+			<PerspectiveCamera makeDefault fov={40} position={[0, 0, 6]} />
 		</>
 	)
 }
