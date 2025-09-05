@@ -1,0 +1,193 @@
+@use '@mixins' as *;
+
+.mf-cursor {
+	$root: &;
+
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 250;
+
+	direction: ltr;
+	contain: layout style size;
+	pointer-events: none;
+
+	transition: opacity 0.3s, color 0.4s;
+
+	@include mobile {
+		display: none;
+	}
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: -#{vw(32)};
+		left: -#{vw(32)};
+		display: block;
+		width: vw(64);
+		height: vw(64);
+		transform: scale(0.2);
+
+		background: var(--color-orange);
+		border-radius: 50%;
+
+		transition: transform 0.25s ease-in-out, opacity 0.1s, background 0.25s;
+	}
+
+	&.--inverse {
+		color: invert(var(--color-orange));
+	}
+
+	&.--exclusion {
+		@supports (mix-blend-mode: exclusion) {
+			mix-blend-mode: exclusion;
+
+			&:before {
+				background: invert(var(--color-orange));
+			}
+		}
+	}
+
+	&.--pointer {
+		&:before {
+			transform: scale(0.15);
+		}
+	}
+
+	&.--text {
+		&:before {
+			transform: scale(1.7);
+			border: vw(6) solid var(--color-white);
+			top: vw(-38);
+			left: vw(-38);
+		}
+
+		&.--active:before {
+			transform: scale(1.6);
+			transition-duration: 0.2s;
+		}
+	}
+
+	&.--icon {
+		&:before {
+			transform: scale(1.5);
+		}
+
+		&.--active:before {
+			transform: scale(1.4);
+		}
+
+		&.--white {
+			&:before {
+				background: white;
+			}
+		}
+	}
+
+	&.--icon-big {
+		&:before {
+			transform: scale(2.6);
+			background: white;
+			transition: transform 0.1s ease-in-out, background 0.25s;
+		}
+
+		&.--active:before {
+			transform: scale(2);
+		}
+	}
+
+	&.--hidden {
+		&:before {
+			transform: scale(0);
+		}
+	}
+
+	&-text {
+		position: absolute;
+		top: -#{vw(24)};
+		left: -#{vw(24)};
+		width: vw(48);
+		height: vw(48);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transform: scale(0) rotate(0deg);
+
+		opacity: 0;
+		color: var(--color-white);
+
+		font-size: vw(12);
+		line-height: 1;
+		font-weight: 500;
+		text-align: center;
+		text-decoration: underline;
+
+		transition: opacity 0.4s, transform 0.3s;
+
+		svg {
+			transition: fill 0.4s;
+			fill: white;
+		}
+
+		#{$root}.--text &,
+		#{$root}.--icon &,
+		#{$root}.--icon-big & {
+			opacity: 1;
+			transform: scale(1) rotate(-15deg);
+		}
+
+		#{$root}.--icon-big &,
+		#{$root}.--icon.--white & {
+			transform: scale(1.8);
+
+			svg {
+				fill: var(--color-orange);
+			}
+		}
+	}
+
+	&-media {
+		position: absolute;
+		width: vw(400);
+		height: vw(400);
+		margin: (-#{vw(200)}) 0 0 (-#{vw(200)});
+
+		img,
+		video {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			border-radius: 50%;
+
+			@supports (object-fit: cover) {
+				position: static;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				transform: translateZ(0);
+			}
+		}
+
+		&-box {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			overflow: hidden;
+			transform: scale(0) translateZ(0);
+			padding: 1px;
+
+			opacity: 0;
+			border-radius: 50%;
+
+			transition: transform 0.35s, opacity 0.2s 0.2s;
+
+			#{$root}.--media & {
+				opacity: 1;
+				transform: scale(0.696);
+				transition-duration: 0.4s, 0.4s;
+				transition-delay: 0s, 0s;
+			}
+		}
+	}
+}

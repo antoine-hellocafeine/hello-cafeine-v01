@@ -6,17 +6,26 @@ export const metadata = {
 import R3F from '@/libs/R3F'
 import GSAP from '@/libs/GSAP'
 import Lenis from '@/libs/Lenis'
+import Cursor from '@/libs/Cursor'
+import fontsClasses from '@/libs/Fonts'
+import ScrollProgress from '@/components/ScrollProgress'
+import Preloader from '@/components/Preloader'
+import Header from '@/components/Header'
 
 import '@/styles/app.scss'
 
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en">
-			<body>
+			<body className={fontsClasses}>
 				<Lenis>
+					<Preloader />
 					<GSAP />
-					{children}
-					<R3F />
+					<Header />
+					<main>{children}</main>
+					<ScrollProgress />
+					{/* <R3F /> */}
+					<Cursor />
 				</Lenis>
 			</body>
 		</html>

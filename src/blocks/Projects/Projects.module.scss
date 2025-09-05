@@ -1,0 +1,191 @@
+@use '@mixins' as *;
+
+.projects {
+	height: 100vh;
+	width: 100vw;
+	position: relative;
+	color: var(--color-black);
+	overflow: hidden;
+
+	:global(#scrollProgress) {
+		position: absolute;
+		top: vw(64.5);
+		right: vw(20);
+		bottom: auto;
+		z-index: 20;
+	}
+
+	.content {
+		position: absolute;
+		inset: 50% vw(20) auto vw(20);
+		transform: translateY(-50%);
+		z-index: 30;
+		display: flex;
+		align-items: center;
+
+		.texts {
+			width: vw(280);
+			font-size: vw(16);
+			line-height: 1.5;
+			font-weight: 300;
+			position: relative;
+
+			strong {
+				font-weight: 500;
+				display: inline-block;
+			}
+
+			& > div:nth-child(1) {
+				position: relative;
+				z-index: 50;
+			}
+
+			& > div:not(:nth-child(1)) {
+				@include absolute;
+				width: 100%;
+			}
+		}
+
+		.medias {
+			width: vw(600);
+			height: vw(360);
+			margin: 0 vw(200) 0 vw(120);
+			position: relative;
+
+			& > div {
+				@include absoluteFull;
+				overflow: hidden;
+				transform-origin: center center;
+
+				&:nth-child(1) {
+					@include absolute;
+				}
+
+				img,
+				video {
+					@include img;
+				}
+			}
+		}
+
+		.infos {
+			flex: 1;
+			position: relative;
+
+			& > div {
+				display: flex;
+				flex-direction: column;
+				gap: vw(60);
+
+				&:nth-child(1) {
+					position: relative;
+					z-index: 50;
+				}
+
+				&:not(:nth-child(1)) {
+					@include absolute;
+					width: 100%;
+				}
+
+				h3 {
+					line-height: 1.6;
+					font-size: vw(14);
+					font-weight: 300;
+					margin-bottom: vw(16);
+					display: block;
+				}
+
+				span,
+				a,
+				h2 {
+					font-size: vw(18);
+					font-weight: 400;
+					line-height: 1.3;
+					display: block;
+					margin-bottom: vw(12);
+
+					&:last-child {
+						margin-bottom: 0;
+					}
+				}
+
+				strong {
+					font-weight: 400;
+					color: var(--color-orange);
+				}
+
+				a {
+					color: var(--color-orange);
+					text-decoration: underline;
+
+					&:hover {
+						text-decoration: none;
+					}
+				}
+			}
+		}
+	}
+
+	.projectsWrapper {
+		position: absolute;
+		z-index: 20;
+		font-size: vw(120);
+		line-height: 1;
+		font-weight: 600;
+		text-transform: uppercase;
+		display: flex;
+		gap: vw(20);
+		flex-wrap: nowrap;
+		bottom: vw(-30);
+		left: 0;
+		padding: 0 vw(20);
+		width: max-content;
+		will-change: transform;
+
+		.link {
+			position: relative;
+			will-change: transform;
+			overflow: hidden;
+
+			:global(.char) {
+				position: relative;
+				display: inline-block;
+				will-change: transform;
+			}
+
+			& > span,
+			& > a {
+				position: relative;
+				display: inline-block;
+				overflow: hidden;
+			}
+
+			span {
+				white-space: nowrap;
+
+				&:nth-child(1) {
+					opacity: 0.8;
+				}
+
+				&:nth-child(2) {
+					position: absolute;
+					top: 0;
+					left: 0;
+					color: var(--color-orange);
+				}
+			}
+		}
+	}
+
+	.background {
+		position: absolute;
+		height: 130vh;
+		width: 100vw;
+		bottom: 0;
+		left: 0;
+
+		video {
+			@include img;
+		}
+	}
+}

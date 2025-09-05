@@ -2,7 +2,6 @@
 
 import { useRef, useEffect } from 'react'
 import {
-	View,
 	useGLTF,
 	PerspectiveCamera,
 	Environment,
@@ -20,22 +19,23 @@ import {
 	SSAO,
 } from '@react-three/postprocessing'
 import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, Canvas } from '@react-three/fiber'
 import gsap from 'gsap'
 import * as THREE from 'three'
+import { Perf } from 'r3f-perf'
 
-import styles from './Star.module.scss'
-
-function GoboSpotlight({ ref }) {
+function GoboSpotlight() {
 	const spotlightRef = useRef()
 	const decayValue = useRef(0.59)
-	const goboTexture = useTexture('/gobo-pattern.webp')
+	const goboTexture = useTexture('/gobo-pattern.webp', (texture) => {
+		texture.generateMipmaps = false // If texture is power-of-2
+		texture.flipY = false
+	})
 
 	goboTexture.wrapS = goboTexture.wrapT = THREE.RepeatWrapping
 	goboTexture.magFilter = THREE.LinearFilter
 	goboTexture.minFilter = THREE.LinearMipmapLinearFilter
 
-	// Setup decay animation on mount
 	useEffect(() => {
 		const timeline = gsap.timeline({
 			repeat: -1,
@@ -43,7 +43,6 @@ function GoboSpotlight({ ref }) {
 			ease: 'sine.inOut',
 		})
 
-		// Animate between 0.3 and 0.8 with 0.59 as the base
 		timeline
 			.to(decayValue, {
 				current: 0.72,
@@ -61,7 +60,6 @@ function GoboSpotlight({ ref }) {
 		}
 	}, [])
 
-	// Apply the animated decay value to the spotlight
 	useFrame(() => {
 		if (spotlightRef.current) {
 			spotlightRef.current.decay = decayValue.current
@@ -90,76 +88,126 @@ const StarModel = ({ onReady }) => {
 	const { actions } = useAnimations(animations, scene)
 
 	useEffect(() => {
+		// Ensure materials are set up properly for post-processing
+		if (scene) {
+			scene.traverse((child) => {
+				if (child.isMesh) {
+					// Ensure the material writes to depth buffer
+					child.material.depthWrite = true
+					child.material.depthTest = true
+					// Force material to be visible to post-processing
+					child.material.transparent = false
+				}
+			})
+		}
+
 		if (modelRef.current && onReady) {
 			onReady(modelRef.current)
 		}
-	}, [onReady])
+	}, [scene, onReady])
 
 	return (
-		<>
-			<Float speed={2.4} floatIntensity={0.8} rotationIntensity={0.6}>
-				<group>
-					<primitive
-						ref={modelRef}
-						object={scene.clone()}
-						scale={0.72}
-						position={[0, -4, 0]}
-						rotation={[0, Math.PI * 2, 0]}
-					/>
-				</group>
-			</Float>
-			<Environment renderPriority={1} background={false} environmentIntensity={0.1} preset="park" />
-			<GoboSpotlight />
-			<EffectComposer renderPriority={1} enableNormalPass={true}>
-				<ToneMapping
-					blendFunction={BlendFunction.NORMAL}
-					adaptive={true}
-					resolution={352}
-					middleGrey={0.1}
-					maxLuminance={20.0}
-					averageLuminance={0.3}
-					adaptationRate={0.6}
+		<Float speed={2.4} floatIntensity={0.8} rotationIntensity={0.6}>
+			<group>
+				<primitive
+					ref={modelRef}
+					object={scene}
+					scale={0.8}
+					position={[0, -4, 0]}
+					rotation={[0, Math.PI * 2, 0]}
 				/>
-				<HueSaturation blendFunction={BlendFunction.NORMAL} hue={-0.2} saturation={0.22} />
-				<Bloom
-					intensity={0.2} // The bloom intensity.
-					blurPass={undefined} // A blur pass.
-					kernelSize={KernelSize.LARGE} // blur kernel size
-					luminanceThreshold={0.9} // luminance threshold. Raise this value to mask out darker elements in the scene.
-					luminanceSmoothing={0.025} // smoothness of the luminance threshold. Range is [0, 1]
-					mipmapBlur={false} // Enables or disables mipmap blur.
-					resolutionX={Resolution.AUTO_SIZE} // The horizontal resolution.
-					resolutionY={Resolution.AUTO_SIZE} // The vertical resolution.
-				/>
-				<BrightnessContrast
-					brightness={-1} // brightness. min: -1, max: 1
-					contrast={1} // contrast: min -1, max: 1
-				/>
-				<SSAO
-					blendFunction={BlendFunction.MULTIPLY} // blend mode
-					samples={30} // amount of samples per pixel (shouldn't be a multiple of the ring count)
-					rings={4} // amount of rings in the occlusion sampling pattern
-					distanceThreshold={1.0} // global distance threshold at which the occlusion effect starts to fade out. min: 0, max: 1
-					distanceFalloff={0.0} // distance falloff. min: 0, max: 1
-					rangeThreshold={0.5} // local occlusion range threshold at which the occlusion starts to fade out. min: 0, max: 1
-					rangeFalloff={0.1} // occlusion range falloff. min: 0, max: 1
-					luminanceInfluence={0.9} // how much the luminance of the scene influences the ambient occlusion
-					radius={20} // occlusion sampling radius
-					scale={0.5} // scale of the ambient occlusion
-					bias={0.5} // occlusion bias
-				/>
-			</EffectComposer>
-			<PerspectiveCamera makeDefault fov={40} position={[0, 0, 6]} />
-		</>
+			</group>
+		</Float>
 	)
 }
 
 StarModel.displayName = 'StarModel'
 
+// Inner component that contains the 3D scene
+function StarScene({ onModelReady }) {
+	return (
+		<>
+			<Environment background={false} environmentIntensity={0.1} preset="park" />
+			<GoboSpotlight />
+
+			{/* Camera */}
+			<PerspectiveCamera makeDefault fov={40} position={[0, 0, 6]} />
+
+			{/* Model */}
+			<StarModel onReady={onModelReady} />
+
+			{/* Post-processing effects MUST be last in the scene */}
+			{/* <EffectComposer enableNormalPass>
+				<ToneMapping
+					blendFunction={BlendFunction.NORMAL}
+					adaptive={true}
+					resolution={256}
+					middleGrey={0.6}
+					maxLuminance={16.0}
+					averageLuminance={1.0}
+					adaptationRate={1.0}
+				/>
+				<Bloom
+					intensity={1.0}
+					kernelSize={KernelSize.LARGE}
+					luminanceThreshold={0.9}
+					luminanceSmoothing={0.025}
+					mipmapBlur={false}
+				/>
+				<HueSaturation
+					blendFunction={BlendFunction.NORMAL}
+					hue={0}
+					saturation={0.1} // Slight saturation boost
+				/>
+				<BrightnessContrast
+					brightness={0}
+					contrast={0.1} // Slight contrast boost
+				/>
+				<SSAO
+					blendFunction={BlendFunction.MULTIPLY}
+					samples={8}
+					rings={4}
+					distanceThreshold={1.0}
+					distanceFalloff={0.0}
+					rangeThreshold={0.5}
+					rangeFalloff={0.1}
+					luminanceInfluence={0.9}
+					radius={20}
+					scale={0.5}
+					bias={0.5}
+				/>
+			</EffectComposer> */}
+		</>
+	)
+}
+
+// Main component
 export default function Star({ viewRef, onModelReady }) {
 	return (
-		<View ref={viewRef} className={styles.star}>
-			<StarModel onReady={onModelReady} />
-		</View>
+		<div ref={viewRef}>
+			<Canvas
+				gl={{
+					antialias: true,
+					toneMapping: THREE.ACESFilmicToneMapping,
+					outputColorSpace: THREE.SRGBColorSpace,
+				}}
+				shadows
+				dpr={[1, 2]}
+				style={{
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					width: '100vw',
+					height: '100vh',
+					overflow: 'hidden',
+					pointerEvents: 'none',
+					zIndex: 200,
+					background: 'transparent',
+				}}
+			>
+				<StarScene onModelReady={onModelReady} />
+				{/* <Perf position="top-left" /> */}
+			</Canvas>
+		</div>
 	)
 }

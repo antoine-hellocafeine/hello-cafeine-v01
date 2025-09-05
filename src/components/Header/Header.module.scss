@@ -1,0 +1,27 @@
+@use '@mixins' as *;
+
+.header {
+	position: fixed;
+	z-index: 4000;
+	top: vw(60);
+	left: 50%;
+	transform: translateX(-50%);
+
+	.headline {
+		color: var(--color-white);
+		display: flex;
+		align-items: center;
+		gap: vw(12);
+
+		svg {
+			width: vw(15);
+			height: vw(15);
+		}
+
+		span {
+			font-size: vw(14);
+			text-transform: lowercase;
+			font-weight: 300;
+		}
+	}
+}

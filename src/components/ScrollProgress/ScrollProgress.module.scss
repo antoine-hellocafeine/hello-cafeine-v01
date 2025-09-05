@@ -1,0 +1,105 @@
+@use '@mixins' as *;
+
+.scrollProgress {
+	display: flex;
+	align-items: baseline;
+	position: fixed;
+	bottom: vw(30);
+	right: vw(20);
+	z-index: 300;
+	gap: vw(30);
+	height: fit-content;
+
+	&.--dark {
+		* {
+			color: var(--color-black) !important;
+		}
+
+		.progress {
+			.fill {
+				background: var(--color-black) !important;
+			}
+
+			.background {
+				background: var(--color-black) !important;
+				opacity: 0.2;
+			}
+		}
+	}
+
+	* {
+		transition: color 0.4s ease-out, background 0.4s ease-out;
+	}
+
+	.text {
+		font-weight: 200;
+		color: var(--color-white);
+		position: relative;
+		overflow: hidden;
+		line-height: 1;
+		text-transform: lowercase;
+
+		span {
+			display: block;
+		}
+	}
+
+	.progress {
+		width: vw(128);
+		position: relative;
+		height: 1px;
+
+		.fill,
+		.background {
+			height: 1px;
+			content: '';
+			width: 100%;
+		}
+
+		.fill {
+			transform-origin: center left;
+			transform: scaleX(0);
+			background: var(--color-orange);
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
+
+		.background {
+			background: var(--color-white);
+		}
+	}
+
+	.numbers {
+		display: flex;
+		align-items: baseline;
+
+		.number {
+			position: relative;
+			overflow: hidden;
+			font-size: vw(14);
+
+			span {
+				display: block;
+
+				&:first-child {
+					color: var(--color-white);
+					position: relative;
+				}
+
+				&:not(:first-child) {
+					@include absolute;
+					color: var(--color-orange);
+				}
+			}
+		}
+
+		& > span {
+			font-size: vw(8);
+			color: var(--color-white);
+			font-style: italic;
+			display: block;
+			margin-left: vw(4);
+		}
+	}
+}

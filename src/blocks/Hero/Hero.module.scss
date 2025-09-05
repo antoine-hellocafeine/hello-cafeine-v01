@@ -2,16 +2,82 @@
 
 .hero {
 	height: 300vh;
+	position: relative;
+	z-index: 2;
 
-	.background {
-		position: sticky;
-		top: 0;
-		left: 0;
-		height: 100vh;
+	.title {
+		position: absolute;
+		font-size: vw(100);
+		line-height: 1;
+		font-weight: 900;
+		color: var(--color-white);
+		left: vw(20);
+		top: calc(100vh - vw(30));
+		transform: translateY(-100%);
+		font-family: var(--font-hc);
+
+		span {
+			display: block;
+			text-transform: uppercase;
+
+			&:nth-child(2) {
+				color: var(--color-orange);
+			}
+		}
+	}
+
+	.text {
+		color: var(--color-white);
+		font-weight: 200;
+		width: vw(300);
+		font-size: vw(18);
+		line-height: 1.6;
+		position: absolute;
+		top: 50vh;
+		transform: translateY(-50%);
+		right: vw(280);
+
+		strong {
+			display: inline-block;
+			margin-bottom: vw(40);
+			text-transform: uppercase;
+			line-height: 1.3;
+			font-size: vw(14);
+			font-family: var(--font-hc);
+		}
+	}
+
+	:global(.pin-spacer) {
+		z-index: 200 !important;
+
+		&:last-child {
+			z-index: 5 !important;
+			pointer-events: none;
+		}
+	}
+
+	.maskBackground {
+		position: absolute; // important: fixed so it covers viewport
+		height: 30vh;
 		width: 100vw;
+		bottom: 0;
+		left: 0;
+		clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%); // start closed
+		z-index: 400; // above background, below content
+		pointer-events: none; // mask shouldn't block interaction
+		overflow: hidden;
 
-		video {
-			@include img;
+		div {
+			position: absolute;
+			height: 130vh;
+			width: 100vw;
+			bottom: 30vh;
+			left: 0;
+			transform: translateY(100%);
+
+			video {
+				@include img;
+			}
 		}
 	}
 }
