@@ -11,7 +11,13 @@
 
 	.background,
 	.reveal {
-		@include absoluteFull;
+		position: absolute;
+		width: 110vw;
+		height: 110vh;
+		top: -5vh;
+		left: -5vw;
+		right: auto;
+		bottom: 0;
 
 		video {
 			@include img;

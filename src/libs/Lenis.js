@@ -10,11 +10,19 @@ export default function Lenis({ children }) {
 	useEffect(() => {
 		const initLenis = () => {
 			if (lenisRef.current?.lenis) {
-				console.log('Lenis ready:', lenisRef.current.lenis)
 				const lenis = lenisRef.current.lenis
 
 				lenis.scrollTo(0, { immediate: true })
 				lenis.stop()
+
+				const contactBtn = document.querySelector('a[href="#projects"]')
+
+				contactBtn.addEventListener('click', (e) => {
+					e.preventDefault()
+					lenis.scrollTo('#projects', {
+						duration: 2,
+					})
+				})
 
 				setTimeout(() => {
 					lenis.start()

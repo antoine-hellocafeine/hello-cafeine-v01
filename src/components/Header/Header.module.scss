@@ -3,9 +3,18 @@
 .header {
 	position: fixed;
 	z-index: 4000;
-	top: vw(60);
-	left: 50%;
-	transform: translateX(-50%);
+	inset: vw(50) vw(80) auto vw(20);
+	height: fit-content;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+	.logo {
+		svg {
+			width: vw(109);
+			height: vw(41);
+		}
+	}
 
 	.headline {
 		color: var(--color-white);
@@ -22,6 +31,37 @@
 			font-size: vw(14);
 			text-transform: lowercase;
 			font-weight: 300;
+		}
+	}
+
+	a {
+		position: relative;
+
+		&:hover {
+			&::after {
+				background: var(--color-orange);
+			}
+
+			span {
+				color: var(--color-orange);
+			}
+		}
+
+		&::after {
+			position: absolute;
+			inset: auto 0 vw(-9) 0;
+			height: vw(1);
+			content: '';
+			background: var(--color-white);
+			transition: 0.4s ease-out;
+		}
+
+		span {
+			font-size: vw(18);
+			font-family: var(--font-hc);
+			color: var(--color-white);
+			text-transform: uppercase;
+			transition: 0.4s ease-out;
 		}
 	}
 }

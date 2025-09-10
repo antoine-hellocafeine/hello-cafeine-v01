@@ -65,6 +65,18 @@
 				video {
 					@include img;
 				}
+
+				.canvasContainer {
+					overflow: hidden;
+					width: 100%;
+					height: 100%;
+
+					canvas {
+						width: 100%;
+						height: 100%;
+						object-fit: cover; // Ensures proper aspect ratio
+					}
+				}
 			}
 		}
 
@@ -179,10 +191,10 @@
 
 	.background {
 		position: absolute;
-		height: 130vh;
-		width: 100vw;
-		bottom: 0;
-		left: 0;
+		height: 140vh;
+		width: 110vw;
+		bottom: -5vh;
+		left: -5vw;
 
 		video {
 			@include img;

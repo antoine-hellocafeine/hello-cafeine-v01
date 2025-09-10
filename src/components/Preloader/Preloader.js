@@ -2,7 +2,7 @@
 
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import React, { useRef } from 'react'
+import React, { useRef, useLayoutEffect } from 'react'
 import CountUp from 'react-countup'
 
 import SVG from '@/elements/SVG'
@@ -16,6 +16,52 @@ export default function Preloader() {
 		progress: useRef(null),
 		numbers: useRef(null),
 		reveal: useRef(null),
+	}
+	const videoContainerRef = useRef(null)
+
+	let requestAnimationFrameId = null
+	let xForce = 0
+	let yForce = 0
+	const easing = 0.08
+	const speed = 0.01
+
+	useLayoutEffect(() => {
+		window.addEventListener('mousemove', manageMouseMove)
+
+		return () => {
+			window.removeEventListener('mousemove', manageMouseMove)
+		}
+	}, [])
+
+	const manageMouseMove = (e) => {
+		const { movementX, movementY } = e
+		xForce += movementX * speed
+		yForce += movementY * speed
+
+		if (requestAnimationFrameId == null) {
+			requestAnimationFrameId = requestAnimationFrame(animate)
+		}
+	}
+
+	const lerp = (start, target, amount) => start * (1 - amount) + target * amount
+
+	const animate = () => {
+		xForce = lerp(xForce, 0, easing)
+		yForce = lerp(yForce, 0, easing)
+		gsap.set(videoContainerRef.current, {
+			x: `+=${xForce * 0.2 * -1}`,
+			y: `+=${yForce * 0.2 * -1}`,
+		})
+
+		if (Math.abs(xForce) < 0.01) xForce = 0
+		if (Math.abs(yForce) < 0.01) yForce = 0
+
+		if (xForce != 0 || yForce != 0) {
+			requestAnimationFrame(animate)
+		} else {
+			cancelAnimationFrame(requestAnimationFrameId)
+			requestAnimationFrameId = null
+		}
 	}
 
 	useGSAP(() => {
@@ -131,7 +177,7 @@ export default function Preloader() {
 					}}
 				/>
 			</div>
-			<div className={styles.background}>
+			<div ref={videoContainerRef} className={styles.background}>
 				<video src="/background-white.webm" autoPlay loop muted />
 			</div>
 			<div ref={refs.reveal} className={styles.reveal}>

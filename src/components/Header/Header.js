@@ -1,11 +1,93 @@
+'use client'
+
+import gsap from 'gsap'
+import { useRef } from 'react'
+import { useGSAP } from '@gsap/react'
+import Link from 'next/link'
+
 import Copy from '@/animations/Copy'
+import Logo from '@/elements/Logo'
 
 import styles from './Header.module.scss'
 
 export default function Header() {
+	const logoRef = useRef(null)
+	const contactRef = useRef(null)
+	const headlineRef = useRef(null)
+
+	useGSAP(() => {
+		if (!logoRef.current) return
+
+		gsap.from([logoRef.current, contactRef.current], {
+			scale: 0.6,
+			autoAlpha: 0,
+			filter: 'blur(10px)',
+			delay: 4.6,
+			duration: 1,
+			ease: 'power4.out',
+			stagger: 0.8,
+		})
+
+		const tlContact = gsap.timeline({
+			defaults: {
+				ease: 'power4.out',
+				duration: 1,
+			},
+			scrollTrigger: {
+				trigger: '#projects',
+				start: 'top 20%',
+				toggleActions: 'play none none reverse',
+			},
+		})
+
+		tlContact.to(contactRef.current, {
+			scale: 0.6,
+			autoAlpha: 0,
+			filter: 'blur(10px)',
+		})
+
+		const tlLogoHeadline = gsap.timeline({
+			defaults: {
+				ease: 'power4.out',
+				duration: 1,
+			},
+			scrollTrigger: {
+				trigger: '#projects',
+				start: 'top 15%',
+				toggleActions: 'play none none reverse',
+			},
+		})
+
+		const black = window
+			.getComputedStyle(document.documentElement)
+			.getPropertyValue('--color-black')
+
+		tlLogoHeadline
+			.to(logoRef.current.querySelectorAll('[fill]'), {
+				fill: black,
+			})
+			.to(
+				logoRef.current.querySelectorAll('[stroke]'),
+				{
+					stroke: black,
+				},
+				'<',
+			)
+			.to(
+				headlineRef.current,
+				{
+					color: black,
+				},
+				'<',
+			)
+	}, [logoRef])
+
 	return (
 		<header className={styles.header}>
-			<div className={styles.headline}>
+			<div ref={logoRef} className={styles.logo}>
+				<Logo />
+			</div>
+			<div ref={headlineRef} className={styles.headline}>
 				<Copy animateOnScroll={false} delay={4.8}>
 					<span>Smart design</span>
 				</Copy>
@@ -45,6 +127,9 @@ export default function Header() {
 					<span>Communication amplified</span>
 				</Copy>
 			</div>
+			<Link ref={contactRef} href="#projects" data-cursor="--hidden">
+				<span>Contact</span>
+			</Link>
 		</header>
 	)
 }
