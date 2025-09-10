@@ -67,13 +67,6 @@ export default function Header() {
 				fill: black,
 			})
 			.to(
-				logoRef.current.querySelectorAll('[stroke]'),
-				{
-					stroke: black,
-				},
-				'<',
-			)
-			.to(
 				headlineRef.current,
 				{
 					color: black,

@@ -4,7 +4,6 @@ import { useRef, useCallback, useEffect, useState, useLayoutEffect } from 'react
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import SplitText from 'gsap/SplitText'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import Copy from '@/animations/Copy'
 import Image from '@/elements/Image'
@@ -22,17 +21,7 @@ export default function Projects() {
 	const projectsWrapperRef = useRef(null)
 	const [items, setItems] = useState(null)
 	const firstEnterRef = useRef(true)
-	const videoRef = useRef(null)
 	const videoContainerRef = useRef(null)
-	const canvasRef = useRef(null)
-	const canvasContainerRef = useRef(null)
-	const [context, setContext] = useState(null)
-	const frameCount = 122
-
-	// Canvas animation state
-	const [images, setImages] = useState([])
-	const [imagesLoaded, setImagesLoaded] = useState(false)
-	const videoFrames = useRef({ frame: 0 })
 
 	let requestAnimationFrameId = null
 	let xForce = 0
@@ -40,140 +29,13 @@ export default function Projects() {
 	const easing = 0.08
 	const speed = 0.01
 
-	const setCanvasSize = useCallback(() => {
-		if (!canvasRef.current || !context || !canvasContainerRef.current) return
-
-		const canvas = canvasRef.current
-		const container = canvasContainerRef.current
-		const rect = container.getBoundingClientRect()
-
-		// Use the container's actual rendered size
-		const canvasWidth = rect.width
-		const canvasHeight = rect.height
-
-		const pixelRatio = window.devicePixelRatio || 1
-
-		canvas.width = canvasWidth * pixelRatio
-		canvas.height = canvasHeight * pixelRatio
-		canvas.style.width = canvasWidth + 'px'
-		canvas.style.height = canvasHeight + 'px'
-
-		context.scale(pixelRatio, pixelRatio)
-	}, [context])
-
-	const currentFrame = (index) =>
-		`/images/frames/frame_${(index + 1).toString().padStart(4, '0')}.webp`
-
-	// Render canvas frame
-	const render = useCallback(() => {
-		if (!context || !canvasRef.current || !imagesLoaded || !canvasContainerRef.current) return
-
-		const container = canvasContainerRef.current
-		const rect = container.getBoundingClientRect()
-		const canvasWidth = rect.width
-		const canvasHeight = rect.height
-
-		context.clearRect(0, 0, canvasWidth, canvasHeight)
-
-		const img = images[videoFrames.current.frame]
-		if (img && img.complete && img.naturalWidth > 0) {
-			const imageAspect = img.naturalWidth / img.naturalHeight
-			const canvasAspect = canvasWidth / canvasHeight
-
-			let drawWidth, drawHeight, drawX, drawY
-
-			if (imageAspect > canvasAspect) {
-				drawHeight = canvasHeight
-				drawWidth = drawHeight * imageAspect
-				drawX = (canvasWidth - drawWidth) / 2
-				drawY = 0
-			} else {
-				drawWidth = canvasWidth
-				drawHeight = drawWidth / imageAspect
-				drawX = 0
-				drawY = (canvasHeight - drawHeight) / 2
-			}
-
-			context.drawImage(img, drawX, drawY, drawWidth, drawHeight)
-		}
-	}, [context, images, imagesLoaded])
-
-	// Load frame images
-	useEffect(() => {
-		if (!context) return
-
-		const loadedImages = []
-		let imagesToLoad = frameCount
-
-		const onLoad = () => {
-			imagesToLoad--
-			if (imagesToLoad === 0) {
-				setImages(loadedImages)
-				setImagesLoaded(true)
-			}
-		}
-
-		const onError = () => {
-			imagesToLoad--
-			if (imagesToLoad === 0) {
-				setImages(loadedImages)
-				setImagesLoaded(true)
-			}
-		}
-
-		for (let i = 0; i < frameCount; i++) {
-			const img = document.createElement('img')
-			img.addEventListener('load', onLoad)
-			img.addEventListener('error', onError)
-			img.src = currentFrame(i)
-			loadedImages.push(img)
-		}
-
-		return () => {
-			loadedImages.forEach((img) => {
-				img.removeEventListener('load', onLoad)
-				img.removeEventListener('error', onError)
-			})
-		}
-	}, [context, frameCount])
-
-	// Initial render when images are loaded
-	useEffect(() => {
-		if (imagesLoaded) {
-			setCanvasSize()
-			render()
-		}
-	}, [imagesLoaded, render, setCanvasSize])
-
 	useLayoutEffect(() => {
 		window.addEventListener('mousemove', manageMouseMove)
-		window.addEventListener('resize', handleResize)
-
-		const canvas = canvasRef.current
-		if (canvas) {
-			setContext(canvas.getContext('2d'))
-		}
 
 		return () => {
 			window.removeEventListener('mousemove', manageMouseMove)
-			window.removeEventListener('resize', handleResize)
 		}
 	}, [])
-
-	// Handle canvas resize
-	const handleResize = useCallback(() => {
-		if (context) {
-			setCanvasSize()
-			render()
-		}
-	}, [context, setCanvasSize, render])
-
-	// Set canvas size when context is available
-	useEffect(() => {
-		if (context) {
-			setCanvasSize()
-		}
-	}, [context, setCanvasSize])
 
 	const manageMouseMove = (e) => {
 		const { movementX, movementY } = e
@@ -255,7 +117,7 @@ export default function Projects() {
 				ease: 'none',
 			})
 			.to(
-				canvasContainerRef.current,
+				mediaDefaultRef.current.querySelector('video'),
 				{
 					scale: 1.2,
 					ease: 'none',
@@ -377,24 +239,6 @@ export default function Projects() {
 			}),
 		)
 	}, [])
-
-	// Canvas scroll animation
-	useGSAP(() => {
-		if (!imagesLoaded || !containerRef.current) return
-
-		ScrollTrigger.create({
-			trigger: containerRef.current,
-			start: 'top bottom',
-			end: 'bottom bottom',
-			scrub: 1,
-			onUpdate: (self) => {
-				const progress = self.progress
-				const targetFrame = Math.round(progress * (frameCount - 1))
-				videoFrames.current.frame = Math.max(0, Math.min(targetFrame, frameCount - 1))
-				render()
-			},
-		})
-	}, [imagesLoaded, render])
 
 	useGSAP(() => {
 		if (!items) return
@@ -574,9 +418,9 @@ export default function Projects() {
 				<div ref={mediasRef} className={styles.medias}>
 					<div ref={mediaDefaultRef}>
 						<div className={styles.container}>
-							<div ref={canvasContainerRef} className={styles.canvasContainer}>
-								<canvas ref={canvasRef} />
-							</div>
+							<video autoPlay loop muted playsInline>
+								<source src="/teaser.webm" type="video/webm" />
+							</video>
 						</div>
 					</div>
 					<div>
