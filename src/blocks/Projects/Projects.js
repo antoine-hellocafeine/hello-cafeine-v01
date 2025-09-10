@@ -296,10 +296,7 @@ export default function Projects() {
 
 				const media = {
 					el: allMedias[i],
-					img:
-						i === 0
-							? allMedias[i].querySelector(`.${styles.canvasContainer}`)
-							: allMedias[i].querySelector('img'),
+					img: allMedias[i].querySelector(`.${styles.container}`),
 				}
 
 				const tlOpen = gsap.timeline({
@@ -327,7 +324,7 @@ export default function Projects() {
 						media.el,
 						{
 							clipPath: 'inset(0% 0% 0% 0%)',
-							ease: 'expo.inOut',
+							ease: 'slider',
 							duration: 0.6,
 						},
 						0,
@@ -335,8 +332,8 @@ export default function Projects() {
 					.to(
 						media.img,
 						{
-							scale: 1,
-							ease: 'power4.out',
+							left: '-20%',
+							ease: 'slider',
 							duration: 0.6,
 						},
 						'<',
@@ -411,7 +408,7 @@ export default function Projects() {
 			})
 
 			gsap.set(media.img, {
-				scale: 2.4,
+				left: '0%',
 			})
 
 			gsap.set([...lines.text, ...lines.infos], {
@@ -576,15 +573,21 @@ export default function Projects() {
 				</div>
 				<div ref={mediasRef} className={styles.medias}>
 					<div ref={mediaDefaultRef}>
-						<div ref={canvasContainerRef} className={styles.canvasContainer}>
-							<canvas ref={canvasRef} />
+						<div className={styles.container}>
+							<div ref={canvasContainerRef} className={styles.canvasContainer}>
+								<canvas ref={canvasRef} />
+							</div>
 						</div>
 					</div>
 					<div>
-						<Image src="/images/project-sistersgym.webp" alt="project-sistersgym" />
+						<div className={styles.container}>
+							<Image src="/images/project-sistersgym.webp" alt="project-sistersgym" />
+						</div>
 					</div>
 					<div>
-						<Image src="/images/project-bietrymusique.webp" alt="project-bietrymusique" />
+						<div className={styles.container}>
+							<Image src="/images/project-bietrymusique.webp" alt="project-bietrymusique" />
+						</div>
 					</div>
 				</div>
 				<div ref={infosRef} className={styles.infos}>
@@ -743,7 +746,7 @@ export default function Projects() {
 						})
 
 						gsap.set(items[0].media.img, {
-							scale: 2.4,
+							left: '0%',
 						})
 
 						items[0].tlOpen.progress(0).play()
