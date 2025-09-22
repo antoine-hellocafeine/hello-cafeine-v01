@@ -23,6 +23,12 @@ body {
 		pointer-events: none;
 		position: relative;
 	}
+
+	& > header,
+	main,
+	#scrollProgress {
+		visibility: hidden;
+	}
 }
 
 ul {

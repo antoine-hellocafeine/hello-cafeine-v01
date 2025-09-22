@@ -1,15 +1,15 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, Suspense, useState } from 'react'
 import {
 	useGLTF,
 	PerspectiveCamera,
 	Environment,
 	Float,
-	useAnimations,
 	useTexture,
 	SpotLight,
 } from '@react-three/drei'
+import { easing } from 'maath'
 import {
 	EffectComposer,
 	ToneMapping,
@@ -19,10 +19,10 @@ import {
 	SSAO,
 } from '@react-three/postprocessing'
 import { BlendFunction, KernelSize, Resolution } from 'postprocessing'
-import { useFrame, Canvas } from '@react-three/fiber'
+import { useFrame, Canvas, useThree } from '@react-three/fiber'
 import gsap from 'gsap'
 import * as THREE from 'three'
-import { Perf } from 'r3f-perf'
+// import { Perf } from 'r3f-perf'
 
 function GoboSpotlight() {
 	const spotlightRef = useRef()
@@ -77,29 +77,95 @@ function GoboSpotlight() {
 			position={[10, 8, 6]}
 			color={'#b0af9e'}
 			map={goboTexture}
-			castShadow
+			// castShadow
 		/>
 	)
 }
 
 const StarModel = ({ onReady }) => {
+	const intensity = 0.16
+	const damp = 0.14
+	const lerpFactor = 0.1
 	const modelRef = useRef()
-	const { scene, animations } = useGLTF('/glb/star.glb')
-	const { actions } = useAnimations(animations, scene)
+	const groupRef = useRef()
+	const { scene } = useGLTF('/glb/star-transformed.glb', true)
+
+	const [dummy] = useState(() => new THREE.Object3D())
+	const { gl } = useThree()
+	const [pointer, setPointer] = useState({ x: 0, y: 0 })
+	const smoothPointer = useRef({ x: 0, y: 0 })
+	const lookAtTarget = useRef(new THREE.Vector3(0, 0, 1))
+
+	// Track the mouse position relative to the canvas
+	useEffect(() => {
+		const handleMouseMove = (event) => {
+			// Get canvas bounding rect
+			const rect = gl.domElement.getBoundingClientRect()
+
+			// Calculate normalized coordinates (-1 to 1)
+			const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+			const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+
+			setPointer({ x, y })
+		}
+
+		// Add event listener to the actual DOM element containing the canvas
+		window.addEventListener('mousemove', handleMouseMove)
+
+		return () => {
+			window.removeEventListener('mousemove', handleMouseMove)
+		}
+	}, [gl])
+
+	useFrame((_, dt) => {
+		// Smooth the pointer movement using lerp
+		smoothPointer.current.x += (pointer.x - smoothPointer.current.x) * lerpFactor
+		smoothPointer.current.y += (pointer.y - smoothPointer.current.y) * lerpFactor
+
+		// Calculate target position based on smoothed pointer
+		const targetX = smoothPointer.current.x * intensity
+		const targetY = smoothPointer.current.y * intensity
+
+		// Smooth the lookAt target using lerp
+		lookAtTarget.current.x += (targetX - lookAtTarget.current.x) * lerpFactor
+		lookAtTarget.current.y += (targetY - lookAtTarget.current.y) * lerpFactor
+
+		// Make dummy look at the smoothed target position
+		dummy.lookAt(lookAtTarget.current)
+
+		// Easing the model's rotation toward the dummy's rotation
+		if (groupRef.current) {
+			easing.dampQ(groupRef.current.quaternion, dummy.quaternion, damp, dt)
+		}
+	})
 
 	useEffect(() => {
 		// Ensure materials are set up properly for post-processing
-		if (scene) {
-			scene.traverse((child) => {
-				if (child.isMesh) {
-					// Ensure the material writes to depth buffer
-					child.material.depthWrite = true
-					child.material.depthTest = true
-					// Force material to be visible to post-processing
-					child.material.transparent = false
-				}
-			})
+		// if (scene) {
+		// 	scene.traverse((child) => {
+		// 		if (child.isMesh) {
+		// 			// Ensure the material writes to depth buffer
+		// 			child.material.depthWrite = true
+		// 			child.material.depthTest = true
+		// 			// Force material to be visible to post-processing
+		// 			child.material.transparent = false
+		// 		}
+		// 	})
+		// }
+
+		const setDoubleSided = (object) => {
+			if (object.material) {
+				object.material.side = THREE.DoubleSide
+			}
+
+			if (object.children) {
+				object.children.forEach((child) => {
+					setDoubleSided(child)
+				})
+			}
 		}
+
+		setDoubleSided(modelRef.current)
 
 		if (modelRef.current && onReady) {
 			onReady(modelRef.current)
@@ -108,11 +174,11 @@ const StarModel = ({ onReady }) => {
 
 	return (
 		<Float speed={2.4} floatIntensity={0.8} rotationIntensity={0.6}>
-			<group>
+			<group ref={groupRef}>
 				<primitive
 					ref={modelRef}
 					object={scene}
-					scale={0.8}
+					scale={0.76}
 					position={[0, -4, 0]}
 					rotation={[0, Math.PI * 2, 0]}
 				/>
@@ -137,45 +203,18 @@ function StarScene({ onModelReady }) {
 			<StarModel onReady={onModelReady} />
 
 			{/* Post-processing effects MUST be last in the scene */}
-			{/* <EffectComposer enableNormalPass>
+
+			{/* <EffectComposer>
 				<ToneMapping
-					blendFunction={BlendFunction.NORMAL}
+					blendFunction={BlendFunction.LINEAR_DODGE}
 					adaptive={true}
-					resolution={256}
-					middleGrey={0.6}
-					maxLuminance={16.0}
-					averageLuminance={1.0}
-					adaptationRate={1.0}
+					resolution={352}
+					middleGrey={0.1}
+					maxLuminance={20.0}
+					averageLuminance={0.3}
+					adaptationRate={0.6}
 				/>
-				<Bloom
-					intensity={1.0}
-					kernelSize={KernelSize.LARGE}
-					luminanceThreshold={0.9}
-					luminanceSmoothing={0.025}
-					mipmapBlur={false}
-				/>
-				<HueSaturation
-					blendFunction={BlendFunction.NORMAL}
-					hue={0}
-					saturation={0.1} // Slight saturation boost
-				/>
-				<BrightnessContrast
-					brightness={0}
-					contrast={0.1} // Slight contrast boost
-				/>
-				<SSAO
-					blendFunction={BlendFunction.MULTIPLY}
-					samples={8}
-					rings={4}
-					distanceThreshold={1.0}
-					distanceFalloff={0.0}
-					rangeThreshold={0.5}
-					rangeFalloff={0.1}
-					luminanceInfluence={0.9}
-					radius={20}
-					scale={0.5}
-					bias={0.5}
-				/>
+				<HueSaturation blendFunction={BlendFunction.NORMAL} hue={-0.2} saturation={0.22} />
 			</EffectComposer> */}
 		</>
 	)
@@ -190,8 +229,10 @@ export default function Star({ viewRef, onModelReady }) {
 					antialias: true,
 					toneMapping: THREE.ACESFilmicToneMapping,
 					outputColorSpace: THREE.SRGBColorSpace,
+					powerPreference: 'high-performance', // Use discrete GPU
+					alpha: true,
 				}}
-				shadows
+				shadows={true}
 				dpr={[1, 2]}
 				style={{
 					position: 'absolute',
@@ -205,8 +246,10 @@ export default function Star({ viewRef, onModelReady }) {
 					background: 'transparent',
 				}}
 			>
-				<StarScene onModelReady={onModelReady} />
-				{/* <Perf position="top-left" /> */}
+				<Suspense fallback={null}>
+					<StarScene onModelReady={onModelReady} />
+					{/* <Perf position="top-left" /> */}
+				</Suspense>
 			</Canvas>
 		</div>
 	)

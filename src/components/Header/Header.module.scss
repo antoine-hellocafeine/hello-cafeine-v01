@@ -9,10 +9,19 @@
 	justify-content: space-between;
 	align-items: center;
 
+	@include mobile {
+		inset: vw(40, 'mobile') vw(20, 'mobile') auto vw(20, 'mobile');
+	}
+
 	.logo {
 		svg {
 			width: vw(109);
 			height: vw(41);
+
+			@include mobile {
+				width: vw(109, 'mobile');
+				height: vw(41, 'mobile');
+			}
 		}
 	}
 
@@ -21,6 +30,10 @@
 		display: flex;
 		align-items: center;
 		gap: vw(12);
+
+		@include mobile {
+			display: none;
+		}
 
 		svg {
 			width: vw(15);
@@ -54,6 +67,11 @@
 			content: '';
 			background: var(--color-white);
 			transition: 0.4s ease-out;
+
+			@include mobile {
+				inset: auto 0 vw(-9, 'mobile') 0;
+				height: vw(1, 'mobile');
+			}
 		}
 
 		span {
@@ -62,6 +80,10 @@
 			color: var(--color-white);
 			text-transform: uppercase;
 			transition: 0.4s ease-out;
+
+			@include mobile {
+				font-size: vw(18, 'mobile');
+			}
 		}
 	}
 }

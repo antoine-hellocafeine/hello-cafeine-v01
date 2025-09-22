@@ -65,6 +65,14 @@ export default function Preloader() {
 	}
 
 	useGSAP(() => {
+		gsap.set(refs.reveal.current, {
+			visibility: 'visible',
+		})
+
+		gsap.set(refs.shapes.current, {
+			visibility: 'visible',
+		})
+
 		gsap.set(refs.progress.current, {
 			scaleX: 0,
 			transformOrigin: 'left',
@@ -94,9 +102,18 @@ export default function Preloader() {
 			},
 		})
 
+		setTimeout(() => {
+			gsap.set(['body > header', 'main', '#scrollProgress'], {
+				visibility: 'visible',
+			})
+		}, 400)
+
+		const isMobile = window.innerWidth < 1024
+
 		tlHide
 			.to(shapes, {
-				x: -50,
+				x: isMobile ? 0 : -50,
+				y: isMobile ? -50 : '-50%',
 				autoAlpha: 0,
 			})
 			.to(

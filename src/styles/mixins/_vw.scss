@@ -1,5 +1,6 @@
 @use 'sass:math';
 
-@function vw($px) {
-  @return math.div($px, 1440) * 100vw;
+@function vw($px, $context: 'desktop') {
+	$base-width: if($context == 'mobile', 430, 1440);
+	@return math.div($px, $base-width) * 100vw;
 }

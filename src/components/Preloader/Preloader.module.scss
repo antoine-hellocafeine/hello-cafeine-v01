@@ -24,6 +24,10 @@
 		}
 	}
 
+	.reveal {
+		visibility: hidden;
+	}
+
 	ul {
 		position: absolute;
 		display: flex;
@@ -33,11 +37,12 @@
 		top: 50%;
 		transform: translateY(-50%);
 		z-index: 10;
+		visibility: hidden;
 
 		@include mobile {
-			gap: 24px;
 			left: 50%;
-			transform: translate(-50%, -50%);
+			transform: translate(-50% -50%);
+			gap: vw(20, 'mobile');
 		}
 
 		svg {
@@ -45,8 +50,8 @@
 			height: vw(20);
 
 			@include mobile {
-				width: 24px;
-				height: 24px;
+				width: vw(32, 'mobile');
+				height: vw(32, 'mobile');
 			}
 		}
 	}

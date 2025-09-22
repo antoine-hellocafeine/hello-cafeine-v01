@@ -7,6 +7,7 @@ import SplitText from 'gsap/SplitText'
 
 import Copy from '@/animations/Copy'
 import Image from '@/elements/Image'
+import { copyWithFeedback } from '@/utils/CopyEmail'
 
 import styles from './Projects.module.scss'
 
@@ -450,11 +451,18 @@ export default function Projects() {
 							<Copy standby>
 								<h3>E-mail</h3>
 							</Copy>
-							<Copy standby>
-								<span>
-									<strong>click to copy</strong>
-								</span>
-							</Copy>
+							<div className={styles.infoEmail}>
+								<Copy standby>
+									<span>
+										<strong>team@hellocafeine.com</strong>
+									</span>
+								</Copy>
+								<Copy standby>
+									<span onClick={() => copyWithFeedback('team@hellocafeine.com', { isDark: true })}>
+										<strong>click to copy</strong>
+									</span>
+								</Copy>
+							</div>
 						</div>
 						<div>
 							<Copy standby>
@@ -634,14 +642,27 @@ export default function Projects() {
 				</div>
 				<div
 					className={styles.link}
-					onMouseEnter={(e) => {
-						handleMouseEvent(e.target, true)
-					}}
-					onMouseLeave={(e) => {
-						handleMouseEvent(e.target, false)
+					onMouseEnter={() => {
+						if (!firstEnterRef.current) {
+							gsap.set([...items[0].lines.text, ...items[0].lines.infos], {
+								ypercent: 100,
+							})
+
+							gsap.set(items[0].media.el, {
+								zIndex: 4,
+								clipPath: 'inset(0% 0% 0% 100%)',
+							})
+
+							gsap.set(items[0].media.img, {
+								left: '0%',
+							})
+
+							items[0].tlOpen.progress(0).play()
+							firstEnterRef.current = true
+						}
 					}}
 				>
-					<span>More</span>
+					<span>More incoming...</span>
 				</div>
 			</div>
 			<div ref={videoContainerRef} className={styles.background}>

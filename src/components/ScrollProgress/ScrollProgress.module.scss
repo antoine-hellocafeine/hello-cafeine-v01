@@ -10,6 +10,11 @@
 	gap: vw(30);
 	height: fit-content;
 
+	@include mobile {
+		inset: auto vw(36, 'mobile') vw(36, 'mobile') vw(36, 'mobile');
+		gap: vw(30, 'mobile');
+	}
+
 	&.--dark {
 		* {
 			color: var(--color-black) !important;
@@ -39,6 +44,10 @@
 		line-height: 1;
 		text-transform: lowercase;
 
+		@include mobile {
+			font-size: vw(16, 'mobile');
+		}
+
 		span {
 			display: block;
 		}
@@ -48,6 +57,10 @@
 		width: vw(128);
 		position: relative;
 		height: 1px;
+
+		@include mobile {
+			width: vw(100, 'mobile');
+		}
 
 		.fill,
 		.background {
@@ -79,6 +92,10 @@
 			overflow: hidden;
 			font-size: vw(14);
 
+			@include mobile {
+				font-size: vw(14, 'mobile');
+			}
+
 			span {
 				display: block;
 
@@ -100,6 +117,11 @@
 			font-style: italic;
 			display: block;
 			margin-left: vw(4);
+
+			@include mobile {
+				font-size: vw(8, 'mobile');
+				margin-left: vw(4, 'mobile');
+			}
 		}
 	}
 }
