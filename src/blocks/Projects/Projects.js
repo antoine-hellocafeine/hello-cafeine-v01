@@ -23,6 +23,8 @@ export default function Projects() {
 	const [items, setItems] = useState(null)
 	const firstEnterRef = useRef(true)
 	const videoContainerRef = useRef(null)
+	const mobileFooterRef = useRef(null)
+	const [isMobile, setIsMobile] = useState(false)
 
 	let requestAnimationFrameId = null
 	let xForce = 0
@@ -31,12 +33,24 @@ export default function Projects() {
 	const speed = 0.01
 
 	useLayoutEffect(() => {
+		const checkIsMobile = () => {
+			setIsMobile(window.innerWidth < 1024)
+		}
+
+		checkIsMobile()
+
+		window.addEventListener('resize', checkIsMobile)
+	}, [])
+
+	useLayoutEffect(() => {
+		if (isMobile) return
+
 		window.addEventListener('mousemove', manageMouseMove)
 
 		return () => {
 			window.removeEventListener('mousemove', manageMouseMove)
 		}
-	}, [])
+	}, [isMobile])
 
 	const manageMouseMove = (e) => {
 		const { movementX, movementY } = e
@@ -125,6 +139,8 @@ export default function Projects() {
 				},
 				'<',
 			)
+
+		if (isMobile) return
 
 		// Setup project links with split text animation
 		const projectsLinks = Array.from(projectsWrapperRef.current.children)
@@ -239,9 +255,10 @@ export default function Projects() {
 				}
 			}),
 		)
-	}, [])
+	}, [isMobile])
 
 	useGSAP(() => {
+		if (isMobile) return
 		if (!items) return
 
 		// Set initial states for all project items (except default at index 0)
@@ -260,10 +277,12 @@ export default function Projects() {
 				yPercent: 100,
 			})
 		})
-	}, [items])
+	}, [items, isMobile])
 
 	// Smooth animation loop
 	const animate = useCallback(() => {
+		if (isMobile) return
+
 		const { currentX, targetX, lerpFactor } = animationState.current
 
 		// Linear interpolation for smooth movement
@@ -279,10 +298,12 @@ export default function Projects() {
 		if (animationState.current.isAnimating) {
 			requestAnimationFrame(animate)
 		}
-	}, [])
+	}, [isMobile])
 
 	// Start animation loop
 	useEffect(() => {
+		if (isMobile) return
+
 		animationState.current.isAnimating = true
 		animate()
 
@@ -290,7 +311,7 @@ export default function Projects() {
 		return () => {
 			animationState.current.isAnimating = false
 		}
-	}, [animate])
+	}, [animate, isMobile])
 
 	const handleMouseEvent = (el, enter) => {
 		if (window.innerWidth < 1000) return
@@ -383,8 +404,8 @@ export default function Projects() {
 			ref={containerRef}
 			id="projects"
 			className={styles.projects}
-			onMouseMove={handleMouseMove}
-			onMouseEnter={handleMouseEnter}
+			onMouseMove={isMobile ? null : handleMouseMove}
+			onMouseEnter={isMobile ? null : handleMouseEnter}
 		>
 			<div className={styles.content}>
 				<div ref={textsRef} className={styles.texts}>
@@ -400,18 +421,18 @@ export default function Projects() {
 					<div>
 						<Copy standby>
 							<p>
-								Salle de sport <strong>100% féminine</strong>, Syster's Gym avait besoins d'un site
-								sur mesure pour accompagner la <strong>sérénité</strong> que la salle reflète.
+								A gym <strong>exclusively</strong> for women, Syster's Gym needed a custom-built
+								website to reflect the sense of <strong>serenity</strong> that the gym itself
+								embodies.
 							</p>
 						</Copy>
 					</div>
 					<div>
 						<Copy standby>
 							<p>
-								Boutique de pianos adaptée à tous les niveaux et tous les budgets, Bietry Musique
-								vous propose de faire évoluer votre gamme avec ses{' '}
-								<strong>offres de reprise</strong> et son
-								<strong>catalogue enrichi</strong> au fur et à mesure que vous progressez.
+								A piano store for all levels and budgets, Bietry Musique helps you expand your range
+								with its <strong>trade-in offers</strong> and its <strong>expanding catalog</strong>{' '}
+								as you progress.
 							</p>
 						</Copy>
 					</div>
@@ -424,16 +445,20 @@ export default function Projects() {
 							</video>
 						</div>
 					</div>
-					<div>
-						<div className={styles.container}>
-							<Image src="/images/project-sistersgym.webp" alt="project-sistersgym" />
-						</div>
-					</div>
-					<div>
-						<div className={styles.container}>
-							<Image src="/images/project-bietrymusique.webp" alt="project-bietrymusique" />
-						</div>
-					</div>
+					{!isMobile && (
+						<>
+							<div>
+								<div className={styles.container}>
+									<Image src="/images/project-sistersgym.webp" alt="project-sistersgym" />
+								</div>
+							</div>
+							<div>
+								<div className={styles.container}>
+									<Image src="/images/project-bietrymusique.webp" alt="project-bietrymusique" />
+								</div>
+							</div>
+						</>
+					)}
 				</div>
 				<div ref={infosRef} className={styles.infos}>
 					<div ref={infosDefaultRef}>
@@ -583,66 +608,18 @@ export default function Projects() {
 					</div>
 				</div>
 			</div>
-			<div
-				ref={projectsWrapperRef}
-				className={styles.projectsWrapper}
-				onMouseLeave={() => {
-					if (!firstEnterRef.current) {
-						gsap.set([...items[0].lines.text, ...items[0].lines.infos], {
-							ypercent: 100,
-						})
-
-						gsap.set(items[0].media.el, {
-							zIndex: 4,
-							clipPath: 'inset(0% 0% 0% 100%)',
-						})
-
-						gsap.set(items[0].media.img, {
-							left: '0%',
-						})
-
-						items[0].tlOpen.progress(0).play()
-						firstEnterRef.current = true
-					}
-				}}
-			>
-				<div className={styles.link}>
-					<a
-						href="google.fr"
-						target="_blank"
-						data-cursor-text="discover"
-						onMouseEnter={(e) => {
-							handleMouseEvent(e.currentTarget.parentElement, true)
-							handleProjectHover(1)
-						}}
-						onMouseLeave={(e) => {
-							handleMouseEvent(e.currentTarget.parentElement, false)
-							handleProjectLeave(1)
-						}}
-					>
-						<span>Sisters&apos;Gym,</span>
-					</a>
+			{isMobile && (
+				<div ref={mobileFooterRef} className={styles.mobileFooter}>
+					<Copy delay={1}>
+						<a href="mailto:team@hellocafeine.com">Let&apos;s talk about you</a>
+					</Copy>
 				</div>
-				<div className={styles.link}>
-					<a
-						href="google.fr"
-						target="_blank"
-						data-cursor-text="coming soon"
-						onMouseEnter={(e) => {
-							handleMouseEvent(e.currentTarget.parentElement, true)
-							handleProjectHover(2)
-						}}
-						onMouseLeave={(e) => {
-							handleMouseEvent(e.currentTarget.parentElement, false)
-							handleProjectLeave(2)
-						}}
-					>
-						<span>Bietry Musique,</span>
-					</a>
-				</div>
+			)}
+			{!isMobile && (
 				<div
-					className={styles.link}
-					onMouseEnter={() => {
+					ref={projectsWrapperRef}
+					className={styles.projectsWrapper}
+					onMouseLeave={() => {
 						if (!firstEnterRef.current) {
 							gsap.set([...items[0].lines.text, ...items[0].lines.infos], {
 								ypercent: 100,
@@ -662,9 +639,76 @@ export default function Projects() {
 						}
 					}}
 				>
-					<span>More incoming...</span>
+					<div className={styles.link}>
+						<a
+							href="google.fr"
+							target="_blank"
+							data-cursor-text="discover"
+							onMouseEnter={(e) => {
+								if (isMobile) return
+
+								handleMouseEvent(e.currentTarget.parentElement, true)
+								handleProjectHover(1)
+							}}
+							onMouseLeave={(e) => {
+								if (isMobile) return
+
+								handleMouseEvent(e.currentTarget.parentElement, false)
+								handleProjectLeave(1)
+							}}
+						>
+							<span>Sisters&apos;Gym,</span>
+						</a>
+					</div>
+					<div className={styles.link}>
+						<a
+							href="google.fr"
+							target="_blank"
+							data-cursor-text="coming soon"
+							onMouseEnter={(e) => {
+								if (isMobile) return
+
+								handleMouseEvent(e.currentTarget.parentElement, true)
+								handleProjectHover(2)
+							}}
+							onMouseLeave={(e) => {
+								if (isMobile) return
+
+								handleMouseEvent(e.currentTarget.parentElement, false)
+								handleProjectLeave(2)
+							}}
+						>
+							<span>Bietry Musique,</span>
+						</a>
+					</div>
+					<div
+						className={styles.link}
+						onMouseEnter={() => {
+							if (isMobile) return
+
+							if (!firstEnterRef.current) {
+								gsap.set([...items[0].lines.text, ...items[0].lines.infos], {
+									ypercent: 100,
+								})
+
+								gsap.set(items[0].media.el, {
+									zIndex: 4,
+									clipPath: 'inset(0% 0% 0% 100%)',
+								})
+
+								gsap.set(items[0].media.img, {
+									left: '0%',
+								})
+
+								items[0].tlOpen.progress(0).play()
+								firstEnterRef.current = true
+							}
+						}}
+					>
+						<span>More incoming...</span>
+					</div>
 				</div>
-			</div>
+			)}
 			<div ref={videoContainerRef} className={styles.background}>
 				<video src="/background-white.webm" autoPlay loop muted />
 			</div>

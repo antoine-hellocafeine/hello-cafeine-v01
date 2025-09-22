@@ -171,44 +171,45 @@ export default function ScrollProgress() {
 			ease: 'none',
 		})
 
-		const projectsContainer = document.querySelector('#projects')
+		if (window.innerWidth > 1024) {
+			const projectsContainer = document.querySelector('#projects')
 
-		ScrollTrigger.create({
-			trigger: projectsContainer,
-			start: () => {
-				return `top ${
-					100 -
-					(100 *
-						((60 * window.innerWidth) / 1440 +
-							(30 * window.innerWidth) / 1440 +
-							(scrollProgressRef.current.offsetHeight * window.innerWidth) / 1440)) /
-						window.innerHeight
-				}%`
-			},
-			onEnter: () => {
-				projectsContainer.appendChild(scrollProgressRef.current)
-			},
-			onLeaveBack: () => {
-				document.body.appendChild(scrollProgressRef.current)
-			},
-		})
-
-		ScrollTrigger.create({
-			trigger: projectsContainer,
-			start: () => {
-				return `top ${
-					100 -
-					(100 *
-						((30 * window.innerWidth) / 1440 +
-							((scrollProgressRef.current.offsetHeight / 4) * window.innerWidth) / 1440)) /
-						window.innerHeight
-				}%`
-			},
-			toggleClass: {
-				targets: scrollProgressRef.current,
-				className: styles['--dark'],
-			},
-		})
+			ScrollTrigger.create({
+				trigger: projectsContainer,
+				start: () => {
+					return `top ${
+						100 -
+						(100 *
+							((30 * window.innerWidth) / 1440 +
+								((scrollProgressRef.current.offsetHeight / 4) * window.innerWidth) / 1440)) /
+							window.innerHeight
+					}%`
+				},
+				toggleClass: {
+					targets: scrollProgressRef.current,
+					className: styles['--dark'],
+				},
+			})
+			ScrollTrigger.create({
+				trigger: projectsContainer,
+				start: () => {
+					return `top ${
+						100 -
+						(100 *
+							((60 * window.innerWidth) / 1440 +
+								(30 * window.innerWidth) / 1440 +
+								(scrollProgressRef.current.offsetHeight * window.innerWidth) / 1440)) /
+							window.innerHeight
+					}%`
+				},
+				onEnter: () => {
+					projectsContainer.appendChild(scrollProgressRef.current)
+				},
+				onLeaveBack: () => {
+					document.body.appendChild(scrollProgressRef.current)
+				},
+			})
+		}
 	}, [textsRef, progressFillRef, number1Ref, number2Ref, number3Ref])
 
 	return (

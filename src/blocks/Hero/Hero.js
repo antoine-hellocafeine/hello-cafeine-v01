@@ -64,7 +64,6 @@ export default function Hero() {
 			start: 'top top',
 			end: 'bottom bottom',
 			pin: textRef.current,
-			anticipatePin: 1,
 			pinType: 'fixed',
 			onUpdate: ({ progress, direction }) => {
 				if (progress > 0.5 && direction === 1 && !textAnimatedRef.current) {
@@ -171,7 +170,7 @@ export default function Hero() {
 	const handleModelReady = (model) => {
 		// Initial animation
 		gsap.to(model.position, {
-			y: 0.1,
+			y: window.innerWidth < 1024 ? 0.92 : 0.1,
 			duration: 1.2,
 			delay: 4.4,
 			ease: 'power3.out',
@@ -198,16 +197,16 @@ export default function Hero() {
 				})
 
 				gsap.to(model.position, {
-					x: -1.4,
-					y: -0.1,
+					x: window.innerWidth < 1024 ? 0 : -1.4,
+					y: window.innerWidth < 1024 ? 0.6 : -0.1,
 					scrollTrigger,
 					ease: 'power3.out',
 				})
 
 				gsap.to(model.scale, {
-					x: 0.96,
-					y: 0.96,
-					z: 0.96,
+					x: window.innerWidth < 1024 ? 0.48 : 0.96,
+					y: window.innerWidth < 1024 ? 0.48 : 0.96,
+					z: window.innerWidth < 1024 ? 0.48 : 0.96,
 					scrollTrigger,
 					ease: 'power3.out',
 				})

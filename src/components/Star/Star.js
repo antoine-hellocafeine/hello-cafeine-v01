@@ -178,8 +178,8 @@ const StarModel = ({ onReady }) => {
 				<primitive
 					ref={modelRef}
 					object={scene}
-					scale={0.76}
-					position={[0, -4, 0]}
+					scale={window.innerWidth < 1024 ? 0.42 : 0.76}
+					position={[0, window.innerWidth < 1024 ? 4 : -4, 0]}
 					rotation={[0, Math.PI * 2, 0]}
 				/>
 			</group>
