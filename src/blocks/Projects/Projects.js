@@ -610,7 +610,7 @@ export default function Projects() {
 			</div>
 			{isMobile && (
 				<div ref={mobileFooterRef} className={styles.mobileFooter}>
-					<Copy delay={1}>
+					<Copy>
 						<a href="mailto:team@hellocafeine.com">Let&apos;s talk about you</a>
 					</Copy>
 				</div>
@@ -710,7 +710,7 @@ export default function Projects() {
 				</div>
 			)}
 			<div ref={videoContainerRef} className={styles.background}>
-				<video src="/background-white.webm" autoPlay loop muted />
+				<video src="/background-white.webm" autoPlay loop muted playsInline />
 			</div>
 		</section>
 	)

@@ -63,7 +63,7 @@ export default function Lenis({ children }) {
 				smoothTouch: false, // Usually false for better mobile performance
 				syncTouch: true, // Important for iOS
 				syncTouchLerp: 0.1,
-				touchInertiaMultiplier: 35,
+				// touchInertiaMultiplier: 35,
 
 				// Prevent issues
 				normalizeWheel: true, // Consistent cross-browser behavior

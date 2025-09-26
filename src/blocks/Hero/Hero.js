@@ -218,7 +218,7 @@ export default function Hero() {
 		<section ref={containerRef} className={styles.hero}>
 			<div ref={maskRef} className={styles.maskBackground}>
 				<div>
-					<video src="/background-white.webm" autoPlay loop muted />
+					<video src="/background-white.webm" autoPlay loop muted playsInline />
 				</div>
 			</div>
 			<Copy ref={titleRef} className={styles.title} delay={4.2} animateOnScroll={false}>

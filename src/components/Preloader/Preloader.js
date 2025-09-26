@@ -195,10 +195,10 @@ export default function Preloader() {
 				/>
 			</div>
 			<div ref={videoContainerRef} className={styles.background}>
-				<video src="/background-white.webm" autoPlay loop muted />
+				<video src="/background-white.webm" autoPlay loop muted playsInline />
 			</div>
 			<div ref={refs.reveal} className={styles.reveal}>
-				<video src="/background.webm" autoPlay loop muted />
+				<video src="/background.webm" autoPlay loop muted playsInline />
 			</div>
 		</div>
 	)
