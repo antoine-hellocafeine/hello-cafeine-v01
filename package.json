@@ -11,6 +11,7 @@
 		"reinstall": "rm -f package-lock.json yarn.lock pnpm-lock.yaml && rm -rf node_modules && pnpm i"
 	},
 	"dependencies": {
+		"@14islands/r3f-scroll-rig": "github:14islands/r3f-scroll-rig",
 		"@gsap/react": "^2.1.2",
 		"@react-three/drei": "^10.7.4",
 		"@react-three/fiber": "^9.3.0",

@@ -6,6 +6,11 @@
 	position: relative;
 	color: var(--color-black);
 	overflow: hidden;
+	z-index: 30;
+
+	@include mobile {
+		background: var(--color-white);
+	}
 
 	:global(#scrollProgress) {
 		position: absolute;
@@ -62,7 +67,10 @@
 			z-index: 40;
 
 			@include mobile {
-				@include absolute;
+				position: absolute;
+				top: 68vh;
+				left: 50%;
+				transform: translate(-50%, -80%);
 				width: vw(260, 'mobile');
 				height: vw(260, 'mobile');
 				margin: 0;
@@ -110,7 +118,7 @@
 			z-index: 20;
 
 			@include mobile {
-				margin-top: vw(160, 'mobile');
+				margin-top: vw(120, 'mobile');
 			}
 
 			& > div {
@@ -230,7 +238,7 @@
 
 	.mobileFooter {
 		position: absolute;
-		height: 50vh;
+		height: 32vh;
 		bottom: 0;
 		left: 0;
 		right: 0;
@@ -313,6 +321,7 @@
 		width: 110vw;
 		bottom: -5vh;
 		left: -5vw;
+		z-index: 2;
 
 		video {
 			@include img;

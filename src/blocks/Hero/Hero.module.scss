@@ -131,6 +131,10 @@
 		pointer-events: none; // mask shouldn't block interaction
 		overflow: hidden;
 
+		@include mobile {
+			background: var(--color-white);
+		}
+
 		div {
 			position: absolute;
 			height: 140vh;

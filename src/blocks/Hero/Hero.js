@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -18,9 +18,17 @@ export default function Hero() {
 	const textTimelineRef = useRef(null)
 	const textAnimatedRef = useRef(false)
 	const maskRef = useRef(null)
+	const [isMobile, setIsMobile] = useState(true)
 
 	useGSAP(() => {
 		if (!viewRef.current) return
+
+		const checkIsMobile = () => {
+			setIsMobile(window.innerWidth < 1024)
+		}
+
+		checkIsMobile()
+		window.addEventListener('resize', checkIsMobile)
 
 		gsap.set(textRef.current, {
 			filter: 'blur(0px)',
@@ -218,7 +226,7 @@ export default function Hero() {
 		<section ref={containerRef} className={styles.hero}>
 			<div ref={maskRef} className={styles.maskBackground}>
 				<div>
-					<video src="/background-white.webm" autoPlay loop muted playsInline />
+					{!isMobile && <video src="/background-white.webm" autoPlay loop muted playsInline />}
 				</div>
 			</div>
 			<Copy ref={titleRef} className={styles.title} delay={4.2} animateOnScroll={false}>

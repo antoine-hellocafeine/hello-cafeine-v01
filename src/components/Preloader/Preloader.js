@@ -2,7 +2,7 @@
 
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
-import React, { useRef, useLayoutEffect } from 'react'
+import React, { useRef, useLayoutEffect, useState } from 'react'
 import CountUp from 'react-countup'
 
 import SVG from '@/elements/SVG'
@@ -18,6 +18,7 @@ export default function Preloader() {
 		reveal: useRef(null),
 	}
 	const videoContainerRef = useRef(null)
+	const [isMobile, setIsMobile] = useState(true)
 
 	let requestAnimationFrameId = null
 	let xForce = 0
@@ -28,8 +29,16 @@ export default function Preloader() {
 	useLayoutEffect(() => {
 		window.addEventListener('mousemove', manageMouseMove)
 
+		const checkIsMobile = () => {
+			setIsMobile(window.innerWidth < 1024)
+		}
+
+		checkIsMobile()
+		window.addEventListener('resize', checkIsMobile)
+
 		return () => {
 			window.removeEventListener('mousemove', manageMouseMove)
+			window.removeEventListener('resize', checkIsMobile)
 		}
 	}, [])
 
@@ -95,6 +104,8 @@ export default function Preloader() {
 				duration: 0.8,
 			},
 			onComplete: () => {
+				if (isMobile) return
+
 				document
 					.querySelector('#background')
 					.appendChild(refs.reveal.current.querySelector('video'))
@@ -194,11 +205,13 @@ export default function Preloader() {
 					}}
 				/>
 			</div>
-			<div ref={videoContainerRef} className={styles.background}>
-				<video src="/background-white.webm" autoPlay loop muted playsInline />
-			</div>
+			{!isMobile && (
+				<div ref={videoContainerRef} className={styles.background}>
+					<video src="/background-white.webm" autoPlay loop muted playsInline />
+				</div>
+			)}
 			<div ref={refs.reveal} className={styles.reveal}>
-				<video src="/background.webm" autoPlay loop muted playsInline />
+				{!isMobile && <video src="/background.webm" autoPlay loop muted playsInline />}
 			</div>
 		</div>
 	)

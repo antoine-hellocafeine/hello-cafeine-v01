@@ -9,6 +9,10 @@
 	left: 0;
 	z-index: 1;
 
+	@include mobile {
+		background: var(--color-white);
+	}
+
 	.background,
 	.reveal {
 		position: absolute;
@@ -26,6 +30,11 @@
 
 	.reveal {
 		visibility: hidden;
+
+		@include mobile {
+			content: '';
+			background: #000;
+		}
 	}
 
 	ul {

@@ -24,7 +24,7 @@ export default function Projects() {
 	const firstEnterRef = useRef(true)
 	const videoContainerRef = useRef(null)
 	const mobileFooterRef = useRef(null)
-	const [isMobile, setIsMobile] = useState(false)
+	const [isMobile, setIsMobile] = useState(true)
 
 	let requestAnimationFrameId = null
 	let xForce = 0
@@ -132,7 +132,8 @@ export default function Projects() {
 				ease: 'none',
 			})
 			.to(
-				mediaDefaultRef.current.querySelector('video'),
+				mediaDefaultRef.current.querySelector('video') ||
+					mediaDefaultRef.current.querySelector('img'),
 				{
 					scale: 1.2,
 					ease: 'none',
@@ -440,9 +441,13 @@ export default function Projects() {
 				<div ref={mediasRef} className={styles.medias}>
 					<div ref={mediaDefaultRef}>
 						<div className={styles.container}>
-							<video autoPlay loop muted playsInline>
-								<source src="/teaser.webm" type="video/webm" />
-							</video>
+							{!isMobile ? (
+								<video autoPlay loop muted playsInline>
+									<source src="/teaser.webm" type="video/webm" />
+								</video>
+							) : (
+								<Image src="/images/projects-default.webp" alt="project-default" />
+							)}
 						</div>
 					</div>
 					{!isMobile && (
@@ -467,8 +472,8 @@ export default function Projects() {
 								<h3>Phone</h3>
 							</Copy>
 							<Copy standby>
-								<a href="tel:+15551234567" target="_blank">
-									+1 (555) 123-4567
+								<a href="tel:+33650947449" target="_blank">
+									+33 6 50 94 74 49
 								</a>
 							</Copy>
 						</div>
@@ -709,9 +714,11 @@ export default function Projects() {
 					</div>
 				</div>
 			)}
-			<div ref={videoContainerRef} className={styles.background}>
-				<video src="/background-white.webm" autoPlay loop muted playsInline />
-			</div>
+			{!isMobile && (
+				<div ref={videoContainerRef} className={styles.background}>
+					<video src="/background-white.webm" autoPlay loop muted playsInline />
+				</div>
+			)}
 		</section>
 	)
 }

@@ -51,7 +51,7 @@ export default function Lenis({ children }) {
 				duration: 1.2, // Higher = smoother for wheel scroll
 				smoothWheel: true, // Enable smooth wheel scrolling
 				wheelMultiplier: 0.8, // Reduce scroll speed for more control
-				touchMultiplier: 1.8, // Slightly faster for touch devices
+				touchMultiplier: 1.2, // Slightly faster for touch devices
 
 				// Easing and behavior
 				easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Custom easing
@@ -62,8 +62,8 @@ export default function Lenis({ children }) {
 				smooth: true,
 				smoothTouch: false, // Usually false for better mobile performance
 				syncTouch: true, // Important for iOS
-				syncTouchLerp: 0.1,
-				// touchInertiaMultiplier: 35,
+				syncTouchLerp: 0.16,
+				touchInertiaMultiplier: 20,
 
 				// Prevent issues
 				normalizeWheel: true, // Consistent cross-browser behavior
