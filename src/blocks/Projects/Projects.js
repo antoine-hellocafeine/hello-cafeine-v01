@@ -484,11 +484,11 @@ export default function Projects() {
 							<div className={styles.infoEmail}>
 								<Copy standby>
 									<span>
-										<strong>team@hellocafeine.com</strong>
+										<strong>cleo@hellocafeine.com</strong>
 									</span>
 								</Copy>
 								<Copy standby>
-									<span onClick={() => copyWithFeedback('team@hellocafeine.com', { isDark: true })}>
+									<span onClick={() => copyWithFeedback('cleo@hellocafeine.com', { isDark: true })}>
 										<strong>click to copy</strong>
 									</span>
 								</Copy>
@@ -616,7 +616,7 @@ export default function Projects() {
 			{isMobile && (
 				<div ref={mobileFooterRef} className={styles.mobileFooter}>
 					<Copy>
-						<a href="mailto:team@hellocafeine.com">Let&apos;s talk about you</a>
+						<a href="mailto:cleo@hellocafeine.com">Let&apos;s talk about you</a>
 					</Copy>
 				</div>
 			)}
@@ -646,7 +646,7 @@ export default function Projects() {
 				>
 					<div className={styles.link}>
 						<a
-							href="google.fr"
+							href="https://www.sistersgym.fr/"
 							target="_blank"
 							data-cursor-text="discover"
 							onMouseEnter={(e) => {
@@ -667,7 +667,7 @@ export default function Projects() {
 					</div>
 					<div className={styles.link}>
 						<a
-							href="google.fr"
+							href="https://bietry.hellocafeine.com/"
 							target="_blank"
 							data-cursor-text="coming soon"
 							onMouseEnter={(e) => {
