@@ -422,7 +422,7 @@ export default function Projects() {
 					<div>
 						<Copy standby>
 							<p>
-								A gym <strong>exclusively</strong> for women, Syster's Gym needed a custom-built
+								A gym <strong>exclusively</strong> for women, Sister's Gym needed a custom-built
 								website to reflect the sense of <strong>serenity</strong> that the gym itself
 								embodies.
 							</p>
