@@ -499,12 +499,15 @@ export default function Projects() {
 								<h3>Socials</h3>
 							</Copy>
 							<Copy standby>
-								<a href="google.fr" target="_blank">
+								<a
+									href="https://www.instagram.com/hellocafeine.studio?igsh=cXVjNzh3aTl0NzE3"
+									target="_blank"
+								>
 									Instagram
 								</a>
 							</Copy>
 							<Copy standby>
-								<a href="google.fr" target="_blank">
+								<a href="https://www.linkedin.com/company/hello-cafeine/" target="_blank">
 									Linkedin
 								</a>
 							</Copy>
